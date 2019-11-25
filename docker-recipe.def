@@ -1,0 +1,7 @@
+Bootstrap: docker
+From: ubuntu:latest
+
+%post
+	apt update -qq
+	apt-get install -y python3 python3-pip
+	pip3 install numpy pandas matplotlib keras sklearn tensorflow tweepy
