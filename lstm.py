@@ -33,9 +33,8 @@ if not os.path.exists(resultsdir):
     os.makedirs("./" + resultsdir)
 
 #Leitura dos dados de treinamento e teste
-train_df = pd.read_csv('data/train.csv')
-train_df = pd.read_csv('data/train3.csv')
-#train_df = pd.read_csv('classificados.csv')
+train_df = pd.read_csv('data/train-kaggle.csv')
+train_df = pd.read_csv('data/train-git.csv')
 test_df = pd.read_csv('data/test.csv')
 
 #print("DADOS DE ENTRADA ANTES DA LIMPEZA")
