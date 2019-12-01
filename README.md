@@ -18,4 +18,7 @@ Este repositório contém os seguintes arquivos:
 ## Execução dos experimentos
     ./singularity-install.sh
     sudo singularity run imagem.img
-    sh experiments.sh
+    ./experiments-lstm.sh
+    ./experiments-lstm-glove.sh
+    ./experiments-cnn.sh
+    ./experiments-cnn-glove.sh

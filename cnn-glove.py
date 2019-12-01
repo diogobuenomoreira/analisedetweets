@@ -16,7 +16,6 @@ from sklearn.metrics import accuracy_score
 from sklearn.metrics import roc_curve, auc
 
 #some configuration
-BATCH_SIZE = 32
 EMBEDDING_DIMS = 50
 FILTERS = 250
 KERNEL_SIZE = 3
