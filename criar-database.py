@@ -14,10 +14,10 @@ import numpy as np
 from tweepy import TweepError
 
 #Chaves de autorizacao
-consumer_key = ''
-consumer_secret = ''
-access_token = ''
-access_token_secret = ''
+consumer_key = '9jsXzVOgSHGQXAvQ5schQ0Itb'
+consumer_secret = 'cwz6NkDQISu2HKAXBQH9hqqgFXpG0FtHNPxh9oLtq437OFqVLf'
+access_token = '1005906943267999744-MduRcCELEqtLjLVMylW13GVjotxYYF'
+access_token_secret = 'Gbssc10elYx4t056odiqBZC1EcqCdSZjTL2v9wvpwMlTO'
 
 #Abrir conexao
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
