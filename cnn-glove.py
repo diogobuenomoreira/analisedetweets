@@ -21,6 +21,7 @@ FILTERS = 250
 KERNEL_SIZE = 3
 HIDDEN_DIMS = 100
 EPOCHS = 7
+DROPOUT_RATE = 0.5
 
 # import data
 train_df = pd.read_csv('train.csv')
@@ -95,6 +96,7 @@ model.add(Conv1D(FILTERS, KERNEL_SIZE, padding = 'Valid', activation = 'relu'))
 model.add(MaxPooling1D())
 model.add(Flatten())
 model.add(Dense(HIDDEN_DIMS, activation='relu'))
+model.add(Dropout(DROPOUT_RATE))
 model.add(Dense(1,activation='sigmoid'))
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 print(model.summary())
