@@ -8,7 +8,17 @@ do
   echo -e "VOCABSIZE "  $i
   for j in ${TRAINABLE[@]};
   do
-    echo -e "\tLSTM_OUT "  $j
-    python3 lstm-glove.py 250 50 0.7 512 0 $i $j 1> /dev/null 2> /dev/null
+    echo -e "\tTRAINABLE "  $j
+    python3 lstm-glove.py 512 0.7 50 250 0 $i $j 1> /dev/null 2> /dev/null
+    python3 lstm-glove.py 1024 0.3 100 196 0 $i $j 1> /dev/null 2> /dev/null
+    python3 lstm-glove.py 512 0.5 100 196 0 $i $j 1> /dev/null 2> /dev/null
+    python3 lstm-glove.py 2048 0.5 300 250 0 $i $j 1> /dev/null 2> /dev/null
+    python3 lstm-glove.py 1024 0.5 50 250 0 $i $j 1> /dev/null 2> /dev/null
+
+    python3 lstm-glove.py 512 0.7 100 250 1 $i $j 1> /dev/null 2> /dev/null
+    python3 lstm-glove.py 512 0.7 300 250 1 $i $j 1> /dev/null 2> /dev/null
+    python3 lstm-glove.py 512 0.3 200 250 1 $i $j 1> /dev/null 2> /dev/null
+    python3 lstm-glove.py 1024 0.7 200 196 1 $i $j 1> /dev/null 2> /dev/null
+    python3 lstm-glove.py 512 0.7 200 196 1 $i $j 1> /dev/null 2> /dev/null
   done
 done

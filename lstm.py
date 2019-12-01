@@ -23,7 +23,7 @@ from sklearn.metrics import accuracy_score
 from sklearn.metrics import roc_curve, auc
 
 #Argumentos deste programa
-print("\t\t\t\tpython3 lstm.py [batch size] [dropout] [embed_dim] [lstm_out] [database]")
+print("\t\t\t\tpython3 lstm.py [batch size] [dropout] [embed_dim] [lstm_out] [database] [vocabsize]")
 
 #Argumentos
 batchsize = 1024
@@ -41,6 +41,11 @@ if len(sys.argv) > 3:
 lstm_out = 196
 if len(sys.argv) > 4:
     lstm_out = int(sys.argv[4])
+
+vocabsize = 2000
+if len(sys.argv) > 6:
+    vocabsize = int(sys.argv[6])
+
 #Leitura dos dados
 train_df = pd.read_csv('data/train-kaggle.csv')
 resultsdir = 'results-kaggle'
@@ -78,9 +83,8 @@ def clean_up(text):
 x_tr = x_tr.apply(clean_up)
 
 #Funcao para realizar a tokenizacao
-max_fatures = 2000
 def tokenize(text_frame):
-    tokenizer = Tokenizer(num_words=max_fatures, split=' ')
+    tokenizer = Tokenizer(num_words=vocabsize, split=' ')
     #cria um vocabulario com base nas strings do argumento em ordem de frequencia
     tokenizer.fit_on_texts(text_frame.values)
     #troca as palavras pelos seus identificadores
@@ -99,7 +103,7 @@ print('The shape of train is {}'.format(x_tr.shape))
 
 #Criacao da Rede Neural
 model = Sequential()
-model.add(Embedding(max_fatures, embed_dim, input_length = x_tr.shape[1]))
+model.add(Embedding(vocabsize, embed_dim, input_length = x_tr.shape[1]))
 model.add(LSTM(lstm_out, dropout=dropout, recurrent_dropout=dropout))
 model.add(Dense(lstm_out,activation='relu'))
 model.add(Dense(1,activation='sigmoid'))

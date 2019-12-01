@@ -1,17 +1,12 @@
 #####ESTE PROGRAMA REALIZA O TREINAMENTO DE UMA REDE NEURAL PARA CLASSIFICAR
 #####TWEETS COM DISCURSO DE ODIO RACISTA OU SEXISTA UTILIZANDO A ARQUITETURA lstm com glove
-
-
-# Importing libraries
 import sys
 import os
 import re
-import numpy as np # linear algebra
-import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 from time import time
-
-from sklearn.model_selection import train_test_split
 
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
@@ -20,6 +15,7 @@ from keras.layers import Dense, Embedding, LSTM, SpatialDropout1D
 from keras.preprocessing import text, sequence
 from keras.callbacks.callbacks import EarlyStopping
 
+from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import f1_score
 from sklearn.metrics import confusion_matrix
@@ -27,11 +23,7 @@ from sklearn.metrics import accuracy_score
 from sklearn.metrics import roc_curve, auc
 
 #Argumentos deste programa
-print("\t\t\t\tpython3 lstm-glove.py [batch size] [dropout] [embed_dim] [lstm_out] [database]")
-
-resultsdir = 'results3'
-if not os.path.exists(resultsdir):
-    os.makedirs("./" + resultsdir)
+print("\t\t\t\tpython3 lstm-glove.py [batch size] [dropout] [embed_dim] [lstm_out] [database] [vocabsize] [trainable]")
 
 #Argumentos
 batchsize = 1024
@@ -49,15 +41,28 @@ if len(sys.argv) > 3:
 lstm_out = 196
 if len(sys.argv) > 4:
     lstm_out = int(sys.argv[4])
+
+vocabsize = 2000
+if len(sys.argv) > 6:
+    vocabsize = int(sys.argv[6])
+
+trainable = False
+if len(sys.argv) > 7:
+    if sys.argv[7] == '1':
+        trainable = True
+    if sys.argv[7] == '0':
+        trainable = False
+
 #Leitura dos dados
 train_df = pd.read_csv('data/train-kaggle.csv')
+resultsdir = 'results-kaggle-kaggle'
 if len(sys.argv) > 5:
     if sys.argv[5] == '1':
         train_df = pd.read_csv('data/train-git.csv')
-        resultsdir = 'results-git'
+        resultsdir = 'results-kaggle-git'
     if sys.argv[5] == '0':
         train_df = pd.read_csv('data/train-kaggle.csv')
-        resultsdir = 'results-kaggle'
+        resultsdir = 'results-kaggle-kaggle'
 if not os.path.exists(resultsdir):
     os.makedirs("./" + resultsdir)
 
@@ -85,16 +90,12 @@ def clean_up(text):
 #total_data possui todos os dados de entrada e realiza a limpeza dos textos
 x_tr = x_tr.apply(clean_up)
 
-#Tamanho do vocabulario
-VOCAB_SIZE = 2000
-MAXLEN = 300
-
 #Realiza a tokenizacao
-tokenizer = text.Tokenizer(num_words = VOCAB_SIZE,split=' ')
+tokenizer = text.Tokenizer(num_words = vocabsize,split=' ')
 tokenizer.fit_on_texts(x_tr)
 x_tr = tokenizer.texts_to_matrix(x_tr)
 #padroniza o tamanho dos tweets
-x_tr = sequence.pad_sequences(x_tr, maxlen = MAXLEN)
+x_tr = sequence.pad_sequences(x_tr, maxlen = x_tr.shape[1])
 
 #numero de tweets com cada um dos dois rotulos
 print(train_df.groupby('label')['label'].count())
@@ -102,7 +103,7 @@ print(train_df.groupby('label')['label'].count())
 print('The shape of train is {}'.format(x_tr.shape))
 
 embeddings_index = dict()
-f = open('data/glove.6B.100d.txt',encoding="utf8")
+f = open('data/glove.6B.'+str(embed_dim)+'d.txt',encoding="utf8")
 
 for line in f:
     values = line.split()
@@ -111,13 +112,10 @@ for line in f:
     embeddings_index[word] = coefs
 f.close()
 
-embedding_matrix = np.zeros((VOCAB_SIZE, embed_dim))
-
-# prepare embedding matrix
-
-embedding_matrix = np.zeros((VOCAB_SIZE, embed_dim))
+embedding_matrix = np.zeros((vocabsize, embed_dim))
+embedding_matrix = np.zeros((vocabsize, embed_dim))
 for word, index in tokenizer.word_index.items():
-  if index > VOCAB_SIZE - 1:
+  if index > vocabsize - 1:
       break
   else:
     embedding_vector = embeddings_index.get(word)
@@ -127,9 +125,9 @@ for word, index in tokenizer.word_index.items():
 
 #Criacao da Rede Neural
 model = Sequential()
-model.add(Embedding(VOCAB_SIZE, embed_dim, input_length = MAXLEN,
+model.add(Embedding(vocabsize, embed_dim, input_length = x_tr.shape[1],
                     weights = [embedding_matrix],
-                    trainable = False))
+                    trainable = trainable))
 model.add(LSTM(lstm_out, dropout=dropout, recurrent_dropout=dropout))
 model.add(Dense(lstm_out,activation='relu'))
 model.add(Dense(1,activation='sigmoid'))
@@ -150,19 +148,6 @@ r = model.fit(X_train, Y_train, epochs = 7, batch_size=batchsize, verbose = 1,
               validation_data = (X_test,Y_test))
 time = time() - starttime
 
-
-#Grafico
-plt.plot(r.history['loss'], label='loss')
-plt.plot(r.history['val_loss'], label='val_loss')
-plt.legend()
-plt.show()
-
-#acuracia
-plt.plot(r.history['acc'], label='acc')
-plt.plot(r.history['val_acc'], label='val_acc')
-plt.legend()
-plt.show()
-
 #Teste do modelo
 preds = model.predict(X_test)
 
@@ -174,6 +159,11 @@ print('AUC-ROC: {}'.format(round(roc_auc_score(Y_test, preds.round()),4)))
 print('Confusion matrix')
 print(confusion_matrix(Y_test,preds.round()))
 
-file = resultsdir + "/lstm-glove-" + str(embed_dim) + "x" + str(lstm_out) + "_" + str(dropout) + "_" + str(batchsize) + ".out"
+if trainable == True:
+    trainable = 1
+else:
+    trainable = 0
+
+file = resultsdir + "/lstm-glove-" + str(embed_dim) + "x" + str(lstm_out) + "_" + str(dropout) + "_" + str(batchsize) + "_" +str(vocabsize) + "_"+str(trainable)+".out"
 f = open(file,"w+")
-f.write(str(embed_dim) + ";" + str(lstm_out) + ";" + str(dropout) + ";" + str(batchsize) + ";" + str(len(r.history["accuracy"])) + ";" + str(round(time,4)) + ";" + str(round(accuracy_score(Y_test, preds.round()),4)) + ";" + str(round(f1_score(Y_test, preds.round()),4)) + ";" + str(round(roc_auc_score(Y_test, preds.round()),4)) + ";" + str(confusion_matrix(Y_test,preds.round())[0][0]) + ";" + str(confusion_matrix(Y_test,preds.round())[0][1]) + ";" + str(confusion_matrix(Y_test,preds.round())[1][0]) + ";" + str(confusion_matrix(Y_test,preds.round())[1][1]) + "\n")
+f.write(str(embed_dim) + ";" + str(lstm_out) + ";" + str(dropout) + ";" + str(batchsize) + ";" + str(vocabsize) + ";" + str(trainable) + ";" + str(len(r.history["accuracy"])) + ";" + str(round(time,4)) + ";" + str(round(accuracy_score(Y_test, preds.round()),4)) + ";" + str(round(f1_score(Y_test, preds.round()),4)) + ";" + str(round(roc_auc_score(Y_test, preds.round()),4)) + ";" + str(confusion_matrix(Y_test,preds.round())[0][0]) + ";" + str(confusion_matrix(Y_test,preds.round())[0][1]) + ";" + str(confusion_matrix(Y_test,preds.round())[1][0]) + ";" + str(confusion_matrix(Y_test,preds.round())[1][1]) + "\n")
