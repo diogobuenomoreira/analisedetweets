@@ -55,14 +55,14 @@ if len(sys.argv) > 7:
 
 #Leitura dos dados
 train_df = pd.read_csv('data/train-kaggle.csv')
-resultsdir = 'results-kaggle-kaggle'
+resultsdir = 'results-glove-kaggle'
 if len(sys.argv) > 5:
     if sys.argv[5] == '1':
         train_df = pd.read_csv('data/train-git.csv')
-        resultsdir = 'results-kaggle-git'
+        resultsdir = 'results-glove-git'
     if sys.argv[5] == '0':
         train_df = pd.read_csv('data/train-kaggle.csv')
-        resultsdir = 'results-kaggle-kaggle'
+        resultsdir = 'results-glove-kaggle'
 if not os.path.exists(resultsdir):
     os.makedirs("./" + resultsdir)
 
