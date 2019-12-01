@@ -43,3 +43,4 @@ wget http://nlp.stanford.edu/data/glove.6B.zip
 mv glove.6B.zip data/glove.6B.zip
 cd data
 unzip data/glove.6B.zip
+chmod +x experiments*
