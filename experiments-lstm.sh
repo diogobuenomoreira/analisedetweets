@@ -20,7 +20,7 @@ do
         for m in ${BATCHSIZE[@]};
         do
           echo -e "\t\t\t\tBATCHSIZE "  $m
-          python3 lstm.py $m $l $k $k $i 1> /dev/null 2> /dev/null
+          python3 lstm.py $m $l $k $j $i 1> /dev/null 2> /dev/null
         done
       done
     done
