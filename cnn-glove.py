@@ -52,13 +52,13 @@ x_tr = x_tr.apply(clean_up)
 
 #Tamanho do vocabulario
 VOCAB_SIZE = 2000
-MAXLEN = 300
+MAXLEN = 100
 
 #Realiza a tokenizacao
 tokenizer = text.Tokenizer(num_words=VOCAB_SIZE,split=' ')
 tokenizer.fit_on_texts(x_tr)
-x_tr = tokenizer.texts_to_matrix(x_tr)
-#X_test= tokenizer.texts_to_matrix(X_test.values)
+x_tr = tokenizer.texts_to_sequences(x_tr)
+#X_test= tokenizer.texts_to_sequences(X_test.values)
 #padroniza o tamanho dos tweets
 x_tr = sequence.pad_sequences(x_tr, maxlen=MAXLEN)
 #X_test = sequence.pad_sequences(X_test, maxlen=MAXLEN)
