@@ -1,6 +1,6 @@
 #####ESTE PROGRAMA REALIZA O TREINAMENTO DE UMA REDE NEURAL PARA CLASSIFICAR
 #####TWEETS COM DISCURSO DE ODIO RACISTA OU SEXISTA UTILIZANDO A ARQUITETURA lstm
-# Importing libraries
+
 import sys
 import os
 import re
@@ -9,14 +9,13 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from time import time
 
-from sklearn.model_selection import train_test_split
-
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
 from keras.models import Sequential
 from keras.layers import Dense, Embedding, LSTM, SpatialDropout1D
 from keras.callbacks.callbacks import EarlyStopping
 
+from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import f1_score
 from sklearn.metrics import confusion_matrix
@@ -44,6 +43,7 @@ if len(sys.argv) > 4:
     lstm_out = int(sys.argv[4])
 #Leitura dos dados
 train_df = pd.read_csv('data/train-kaggle.csv')
+resultsdir = 'results-kaggle'
 if len(sys.argv) > 5:
     if sys.argv[5] == '1':
         train_df = pd.read_csv('data/train-git.csv')
@@ -75,7 +75,7 @@ def clean_up(text):
     return text
 
 #total_data possui todos os dados de entrada e realiza a limpeza dos textos
-total_data = x_tr.apply(clean_up)
+x_tr = x_tr.apply(clean_up)
 
 #Funcao para realizar a tokenizacao
 max_fatures = 2000
@@ -90,10 +90,7 @@ def tokenize(text_frame):
     return padded_seq
 
 #realiza tokenizacao em todos os tweets
-total_data = tokenize(total_data)
-
-#atribui a tokenizacao nos vetores de treinamento e teste
-x_tr = total_data
+x_tr = tokenize(x_tr)
 
 #numero de tweets com cada um dos dois rotulos
 print(train_df.groupby('label')['label'].count())
