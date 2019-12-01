@@ -5,6 +5,7 @@ LSTM_OUT=(196 250)
 EMBED_DIM=(50 100 200 300)
 DROPOUT=(0.3 0.5 0.7)
 BATCHSIZE=(512 1024 2048)
+
 for i in ${DATABASE[@]};
 do
   echo -e "DATABASE "  $i

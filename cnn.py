@@ -3,9 +3,10 @@
 import sys
 import os
 import re
-import numpy as np # linear algebra
-import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
+from time import time
 
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
@@ -36,7 +37,7 @@ dropout = 0.3
 if len(sys.argv) > 2:
     dropout = float(sys.argv[2])
 
-embed_dim = 128
+embed_dim = 100
 if len(sys.argv) > 3:
     embed_dim = int(sys.argv[3])
 
@@ -125,8 +126,10 @@ print(X_train.shape,Y_train.shape)
 print(X_test.shape,Y_test.shape)
 
 #Treinamento do Modelo
+starttime=time()
 r = model.fit(X_train, Y_train, batch_size = batchsize, epochs = 100000000000,
           validation_data=(X_test, Y_test), callbacks=[callback])
+time = time() - starttime
 
 #Teste do Modelo
 preds = model.predict(X_test)

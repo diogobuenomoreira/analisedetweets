@@ -34,7 +34,7 @@ dropout = 0.3
 if len(sys.argv) > 2:
     dropout = float(sys.argv[2])
 
-embed_dim = 128
+embed_dim = 100
 if len(sys.argv) > 3:
     embed_dim = int(sys.argv[3])
 
