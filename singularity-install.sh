@@ -39,9 +39,9 @@ sudo singularity build imagem.img docker-recipe.def
 
 #BAIXAR DADOS
 echo "BAIXANDO E EXTRAINDO DADOS"
+sudo apt-get install -y unzip
 wget http://nlp.stanford.edu/data/glove.6B.zip
 mv glove.6B.zip data/glove.6B.zip
-cd data
 unzip data/glove.6B.zip -d data/
 chmod +x experiments-cnn-glove.sh
 chmod +x experiments-cnn.sh
