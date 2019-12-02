@@ -42,5 +42,8 @@ echo "BAIXANDO E EXTRAINDO DADOS"
 wget http://nlp.stanford.edu/data/glove.6B.zip
 mv glove.6B.zip data/glove.6B.zip
 cd data
-unzip data/glove.6B.zip
-chmod +x experiments*
+unzip data/glove.6B.zip -d data/
+chmod +x experiments-cnn-glove.sh
+chmod +x experiments-cnn.sh
+chmod +x experiments-lstm-glove.sh
+chmod +x experiments-lstm.sh

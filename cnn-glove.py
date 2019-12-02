@@ -23,7 +23,7 @@ from sklearn.metrics import accuracy_score
 from sklearn.metrics import roc_curve, auc
 
 #Argumentos deste programa
-print("\t\t\t\tpython3 cnn.py [batch size] [dropout] [embed_dim] [filters] [database] [vocabsize] [trainable]")
+print("\t\t\t\tpython3 cnn-glove.py [batch size] [dropout] [embed_dim] [filters] [database] [vocabsize] [trainable]")
 
 #Argumentos
 batchsize = 1024
@@ -93,7 +93,7 @@ x_tr = x_tr.apply(clean_up)
 #Realiza a tokenizacao
 tokenizer = text.Tokenizer(num_words = vocabsize,split=' ')
 tokenizer.fit_on_texts(x_tr)
-x_tr = tokenizer.texts_to_sequences(x_tr)
+x_tr = tokenizer.texts_to_matrix(x_tr)
 #padroniza o tamanho dos tweets
 x_tr = sequence.pad_sequences(x_tr, maxlen = x_tr.shape[1])
 
@@ -107,13 +107,13 @@ for line in f:
     embeddings_index[word] = coefs
 f.close()
 
-embedding_matrix = np.zeros((vocabsize, 100))
+embedding_matrix = np.zeros((vocabsize, embed_dim))
 
 # prepare embedding matrix
 
-embedding_matrix = np.zeros((vocabsize, 100))
+embedding_matrix = np.zeros((vocabsize, embed_dim))
 for word, index in tokenizer.word_index.items():
-  if index > VOCAB_SIZE - 1:
+  if index > vocabsize - 1:
       break
   else:
     embedding_vector = embeddings_index.get(word)
@@ -126,7 +126,8 @@ for word, index in tokenizer.word_index.items():
 hiddendims = filters
 kernelsize = 3
 model = Sequential()
-model.add(Embedding(vocabsize, embed_dim, input_length = x_tr.shape[1], weights = [embedding_matrix], trainable = False))
+model.add(Embedding(vocabsize, embed_dim, input_length = x_tr.shape[1],
+                weights = [embedding_matrix], trainable = trainable))
 model.add(Conv1D(filters, kernelsize, padding = 'Valid', activation = 'relu'))
 model.add(MaxPooling1D())
 model.add(Flatten())
@@ -143,7 +144,6 @@ print(X_test.shape,Y_test.shape)
 
 #Treinamento do modelo
 starttime=time()
-exit()
 r = model.fit(X_train, Y_train, batch_size = batchsize, epochs = 7,
           validation_data=(X_test, Y_test))
 time = time() - starttime
@@ -159,6 +159,11 @@ print('AUC-ROC: {}'.format(round(roc_auc_score(Y_test, preds.round()),4)))
 print('Confusion matrix')
 print(confusion_matrix(Y_test,preds.round()))
 
-file = resultsdir + "/cnn-glove" + str(embed_dim) + "x" + str(lstm_out) + "_" + str(dropout) + "_" + str(batchsize) + ".out"
+if trainable == True:
+    trainable = 1
+else:
+    trainable = 0
+
+file = resultsdir + "/cnn-glove-" + str(embed_dim) + "x" + str(lstm_out) + "_" + str(dropout) + "_" + str(batchsize) + "_" +str(vocabsize) + "_"+str(trainable)+".out"
 f = open(file,"w+")
-f.write(str(embed_dim) + ";" + str(lstm_out) + ";" + str(dropout) + ";" + str(batchsize) + ";" + str(len(r.history["accuracy"])) + ";" + str(round(time,4)) + ";" + str(round(accuracy_score(Y_test, preds.round()),4)) + ";" + str(round(f1_score(Y_test, preds.round()),4)) + ";" + str(round(roc_auc_score(Y_test, preds.round()),4)) + ";" + str(confusion_matrix(Y_test,preds.round())[0][0]) + ";" + str(confusion_matrix(Y_test,preds.round())[0][1]) + ";" + str(confusion_matrix(Y_test,preds.round())[1][0]) + ";" + str(confusion_matrix(Y_test,preds.round())[1][1]) + "\n")
+f.write(str(embed_dim) + ";" + str(lstm_out) + ";" + str(dropout) + ";" + str(batchsize) + ";" + str(vocabsize) + ";" + str(trainable) + ";" + str(len(r.history["accuracy"])) + ";" + str(round(time,4)) + ";" + str(round(accuracy_score(Y_test, preds.round()),4)) + ";" + str(round(f1_score(Y_test, preds.round()),4)) + ";" + str(round(roc_auc_score(Y_test, preds.round()),4)) + ";" + str(confusion_matrix(Y_test,preds.round())[0][0]) + ";" + str(confusion_matrix(Y_test,preds.round())[0][1]) + ";" + str(confusion_matrix(Y_test,preds.round())[1][0]) + ";" + str(confusion_matrix(Y_test,preds.round())[1][1]) + "\n")
