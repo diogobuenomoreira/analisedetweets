@@ -134,9 +134,6 @@ model.add(Dense(1,activation='sigmoid'))
 model.compile(loss = 'binary_crossentropy', optimizer='adam', metrics = ['accuracy'])
 print(model.summary())
 
-#Callback para o treinamento parar quando a acuracia parar de deminiuir
-#callback = EarlyStopping(monitor='val_accuracy', min_delta=0, patience=5, verbose=0, mode='max', baseline=None, restore_best_weights=False)
-
 #Divisao dos dados de treinamento em treinamento e teste
 X_train, X_test, Y_train, Y_test = train_test_split(x_tr,y_tr, test_size = 0.2, random_state = 42)
 print(X_train.shape,Y_train.shape)

@@ -1,13 +1,20 @@
+#####ESTE PROGRAMA REALIZA O TREINAMENTO DE UMA REDE NEURAL PARA CLASSIFICAR
+#####TWEETS COM DISCURSO DE ODIO RACISTA OU SEXISTA UTILIZANDO A ARQUITETURA cnn com glove
+import sys
+import os
 import re
-import numpy as np # linear algebra
-import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
+from time import time
+
 from keras.preprocessing import sequence
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation
 from keras.layers import Embedding
 from keras.layers import Conv1D, Flatten, MaxPooling1D
 from keras.preprocessing import text
+
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import f1_score
@@ -15,17 +22,49 @@ from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import roc_curve, auc
 
-#some configuration
-EMBEDDING_DIMS = 50
-FILTERS = 250
-KERNEL_SIZE = 3
-HIDDEN_DIMS = 100
-EPOCHS = 7
-DROPOUT_RATE = 0.5
+#Argumentos deste programa
+print("\t\t\t\tpython3 cnn.py [batch size] [dropout] [embed_dim] [filters] [database] [vocabsize] [trainable]")
 
-# import data
-train_df = pd.read_csv('train.csv')
+#Argumentos
+batchsize = 1024
+if len(sys.argv) > 1:
+    batchsize = int(sys.argv[1])
 
+dropout = 0.3
+if len(sys.argv) > 2:
+    dropout = float(sys.argv[2])
+
+embed_dim = 100
+if len(sys.argv) > 3:
+    embed_dim = int(sys.argv[3])
+
+filters = 196
+if len(sys.argv) > 4:
+    filters = int(sys.argv[4])
+
+vocabsize = 2000
+if len(sys.argv) > 6:
+    vocabsize = int(sys.argv[6])
+
+trainable = False
+if len(sys.argv) > 7:
+    if sys.argv[7] == '1':
+        trainable = True
+    if sys.argv[7] == '0':
+        trainable = False
+
+#Leitura dos dados
+train_df = pd.read_csv('data/train-kaggle.csv')
+resultsdir = 'results-glove-kaggle'
+if len(sys.argv) > 5:
+    if sys.argv[5] == '1':
+        train_df = pd.read_csv('data/train-git.csv')
+        resultsdir = 'results-glove-git'
+    if sys.argv[5] == '0':
+        train_df = pd.read_csv('data/train-kaggle.csv')
+        resultsdir = 'results-glove-kaggle'
+if not os.path.exists(resultsdir):
+    os.makedirs("./" + resultsdir)
 
 #x_tr possui os dados de entrada para o treinamento
 x_tr = train_df['tweet']
@@ -51,21 +90,15 @@ def clean_up(text):
 #total_data possui todos os dados de entrada e realiza a limpeza dos textos
 x_tr = x_tr.apply(clean_up)
 
-#Tamanho do vocabulario
-VOCAB_SIZE = 2000
-MAXLEN = 100
-
 #Realiza a tokenizacao
-tokenizer = text.Tokenizer(num_words=VOCAB_SIZE,split=' ')
+tokenizer = text.Tokenizer(num_words = vocabsize,split=' ')
 tokenizer.fit_on_texts(x_tr)
 x_tr = tokenizer.texts_to_sequences(x_tr)
-#X_test= tokenizer.texts_to_sequences(X_test.values)
 #padroniza o tamanho dos tweets
-x_tr = sequence.pad_sequences(x_tr, maxlen=MAXLEN)
-#X_test = sequence.pad_sequences(X_test, maxlen=MAXLEN)
+x_tr = sequence.pad_sequences(x_tr, maxlen = x_tr.shape[1])
 
 embeddings_index = dict()
-f = open('glove.6B.100d.txt',encoding="utf8")
+f = open('data/glove.6B.'+str(embed_dim)+'d.txt',encoding="utf8")
 
 for line in f:
     values = line.split()
@@ -74,11 +107,11 @@ for line in f:
     embeddings_index[word] = coefs
 f.close()
 
-embedding_matrix = np.zeros((VOCAB_SIZE, 100))
+embedding_matrix = np.zeros((vocabsize, 100))
 
 # prepare embedding matrix
 
-embedding_matrix = np.zeros((VOCAB_SIZE, 100))
+embedding_matrix = np.zeros((vocabsize, 100))
 for word, index in tokenizer.word_index.items():
   if index > VOCAB_SIZE - 1:
       break
@@ -90,19 +123,18 @@ for word, index in tokenizer.word_index.items():
 
 
 #Criacao da Rede Neural
+hiddendims = filters
+kernelsize = 3
 model = Sequential()
-model.add(Embedding(VOCAB_SIZE, 100, input_length = MAXLEN, weights = [embedding_matrix], trainable = False))
-model.add(Conv1D(FILTERS, KERNEL_SIZE, padding = 'Valid', activation = 'relu'))
+model.add(Embedding(vocabsize, embed_dim, input_length = x_tr.shape[1], weights = [embedding_matrix], trainable = False))
+model.add(Conv1D(filters, kernelsize, padding = 'Valid', activation = 'relu'))
 model.add(MaxPooling1D())
 model.add(Flatten())
-model.add(Dense(HIDDEN_DIMS, activation='relu'))
-model.add(Dropout(DROPOUT_RATE))
+model.add(Dense(hiddendims, activation='relu'))
+model.add(Dropout(dropout))
 model.add(Dense(1,activation='sigmoid'))
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 print(model.summary())
-
-#Callback para o treinamento parar quando a acuracia parar de deminiuir
-#callback = EarlyStopping(monitor='val_accuracy', min_delta=0, patience=5, verbose=0, mode='max', baseline=None, restore_best_weights=False)
 
 #Divisao dos dados de treinamento em treinamento e teste
 X_train, X_test, Y_train, Y_test = train_test_split(x_tr,y_tr, test_size = 0.2, random_state = 42)
@@ -111,21 +143,10 @@ print(X_test.shape,Y_test.shape)
 
 #Treinamento do modelo
 starttime=time()
-r = model.fit(X_train, Y_train, batch_size = batch_size, epochs = EPOCHS,
+exit()
+r = model.fit(X_train, Y_train, batch_size = batchsize, epochs = 7,
           validation_data=(X_test, Y_test))
 time = time() - starttime
-
-#Grafico
-plt.plot(r.history['loss'], label='loss')
-plt.plot(r.history['val_loss'], label='val_loss')
-plt.legend()
-plt.show()
-
-#Acuracia
-plt.plot(r.history['acc'], label='acc')
-plt.plot(r.history['val_acc'], label='val_acc')
-plt.legend()
-plt.show()
 
 #Teste do modelo
 preds = model.predict(X_test)
