@@ -164,6 +164,6 @@ if trainable == True:
 else:
     trainable = 0
 
-file = resultsdir + "/cnn-glove-" + str(embed_dim) + "x" + str(lstm_out) + "_" + str(dropout) + "_" + str(batchsize) + "_" +str(vocabsize) + "_"+str(trainable)+".out"
+file = resultsdir + "/cnn-glove-" + str(embed_dim) + "x" + str(filters) + "_" + str(dropout) + "_" + str(batchsize) + "_" +str(vocabsize) + "_"+str(trainable)+".out"
 f = open(file,"w+")
-f.write(str(embed_dim) + ";" + str(lstm_out) + ";" + str(dropout) + ";" + str(batchsize) + ";" + str(vocabsize) + ";" + str(trainable) + ";" + str(len(r.history["accuracy"])) + ";" + str(round(time,4)) + ";" + str(round(accuracy_score(Y_test, preds.round()),4)) + ";" + str(round(f1_score(Y_test, preds.round()),4)) + ";" + str(round(roc_auc_score(Y_test, preds.round()),4)) + ";" + str(confusion_matrix(Y_test,preds.round())[0][0]) + ";" + str(confusion_matrix(Y_test,preds.round())[0][1]) + ";" + str(confusion_matrix(Y_test,preds.round())[1][0]) + ";" + str(confusion_matrix(Y_test,preds.round())[1][1]) + "\n")
+f.write(str(embed_dim) + ";" + str(filters) + ";" + str(dropout) + ";" + str(batchsize) + ";" + str(vocabsize) + ";" + str(trainable) + ";" + str(len(r.history["accuracy"])) + ";" + str(round(time,4)) + ";" + str(round(accuracy_score(Y_test, preds.round()),4)) + ";" + str(round(f1_score(Y_test, preds.round()),4)) + ";" + str(round(roc_auc_score(Y_test, preds.round()),4)) + ";" + str(confusion_matrix(Y_test,preds.round())[0][0]) + ";" + str(confusion_matrix(Y_test,preds.round())[0][1]) + ";" + str(confusion_matrix(Y_test,preds.round())[1][0]) + ";" + str(confusion_matrix(Y_test,preds.round())[1][1]) + "\n")
