@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VOCABSIZE=(1000 2000 10000 20000)
+VOCABSIZE=(3000)
 TRAINABLE=(0 1)
 
 for j in ${TRAINABLE[@]};
