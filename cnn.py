@@ -83,7 +83,6 @@ def clean_up(text):
     text = text.encode('ascii', 'ignore').decode('ascii')
     return text
 
-
 #x_tr possui todos os dados de entrada e realiza a limpeza dos textos
 x_tr = x_tr.apply(clean_up)
 

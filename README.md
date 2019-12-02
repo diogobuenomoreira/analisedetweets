@@ -7,16 +7,20 @@ Este repositório contém os seguintes arquivos:
 
     baseline.py: o programa da entrega intermediária para o trabalho
     lstm.py: o programa utilizando a arquitetura LSTM
+    lstm-glove.py: o programa utilizando a arquitetura LSTM utilizando Glove
     cnn.py: o programa utilizando a arquitetura CNN
-    test.csv e train.csv: base de dados
+    cnn-glove.py: o programa utilizando a arquitetura CNN utilizando Glove
     singularity-install.sh: script para instalação do Singularity e criação do container com o Singularity
     docker-recipe.def: receita para a criação do container
-    experiments: script para realizar os experimentos
-    pasta result: resultados dos experimentos
-
+    experiments*: scripts para realizar os experimentos
+    contagem.py: contagem de tweets nas bases de dados
+    criar-database.py: cria base de dados a partir do NAACL_SRW_2016.csv
+    pasta result*: resultados dos experimentos
+    pasta data: bases de dados
+    pasta graficos: gráficos dos resultados
 
 ## Execução dos experimentos
-    ./singularity-install.sh
+    sh ./singularity-install.sh
     sudo singularity run imagem.img
     ./experiments-lstm.sh
     ./experiments-lstm-glove.sh
