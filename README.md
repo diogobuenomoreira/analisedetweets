@@ -15,6 +15,7 @@ Este repositório contém os seguintes arquivos:
     experiments*: scripts para realizar os experimentos
     contagem.py: contagem de tweets nas bases de dados
     criar-database.py: cria base de dados a partir do NAACL_SRW_2016.csv
+    script-results*: cria os gráficos e estatísticas
     pasta result*: resultados dos experimentos
     pasta data: bases de dados
     pasta graficos: gráficos dos resultados
